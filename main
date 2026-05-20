@@ -1,0 +1,847 @@
+et balance = 0;
+let clickPower = 1;
+let passiveIncome = 0;
+let lastUpdate = Date.now();
+
+const balanceDisplay = document.getElementById('balance');
+const clickButton = document.getElementById('clickButton');
+const passiveIncomeDisplay = document.getElementById('passiveIncome');
+
+// Функция для обновления отображения
+function updateDisplay() {
+    balanceDisplay.textContent = Balance: ${balance};
+    passiveIncomeDisplay.textContent = Passive Income: ${passiveIncome}/sec;
+}
+
+// Обработчик клика
+clickButton.addEventListener('click', () => {
+    balance += clickPower;
+    updateDisplay();
+});
+
+// Система пассивного дохода
+function updatePassiveIncome() {
+    const now = Date.now();
+    const duration = (now - lastUpdate) / 1000; // Время в секундах
+    balance += duration * passiveIncome;
+    lastUpdate = now;
+    updateDisplay();
+}
+
+// Запускаем таймер для пассивного дохода (раз в секунду)
+setInterval(updatePassiveIncome, 1000);
+
+// Инициализация
+updateDisplay();
+
+// --- Здесь может быть логика для покупки апгрейдов ---
+// Пример:
+// const buyPassiveButton = document.createElement('button');
+// buyPassiveButton.textContent = Upgrade Passive (${passiveIncome * 10} coins);
+// buyPassiveButton.addEventListener('click', () => {
+// const cost = passiveIncome * 10 === 0 ? 50 : passiveIncome * 10; // Начальная цена 50
+// if (balance >= cost) {
+// balance -= cost;
+// passiveIncome += 1;
+// updateDisplay();
+// // Обновляем цену кнопки
+// buyPassiveButton.textContent = Upgrade Passive (${passiveIncome * 10} coins);
+// } else {
+// alert("Not enough coins!");
+// }
+// });
+// document.querySelector('.game-container').appendChild(buyPassiveButton);
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Бизик — Финансовый кликер</title>
+    <style>
+        * {
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(145deg, #e0f2e9 0%, #c8e6d9 100%);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .game-container {
+            max-width: 500px;
+            width: 100%;
+            background: #fef9e6;
+            border-radius: 48px 48px 32px 32px;
+            box-shadow: 12px 12px 0 #6b8c5c;
+            border: 3px solid #7da064;
+            overflow: hidden;
+        }
+
+        .stats {
+            background: #7da064;
+            padding: 20px 20px 28px;
+            color: white;
+            text-shadow: 2px 2px 0 #4a6b3a;
+            border-bottom: 4px solid #b8d9a6;
+        }
+
+        .balance-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .balance-value {
+            font-size: 38px;
+            background: #2d3e24;
+            padding: 6px 16px;
+            border-radius: 60px;
+            letter-spacing: 1px;
+            font-family: monospace;
+        }
+
+        .income-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .level-badge {
+            background: #2d3e24;
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-size: 15px;
+        }
+
+        /* морская свинка — кликабельная зона */
+        .guinea-area {
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.05s linear;
+            flex-direction: column;
+        }
+
+        .guinea-area:active {
+            transform: scale(0.96);
+        }
+
+        .guinea-emoji {
+            font-size: 140px;
+            filter: drop-shadow(8px 12px 0 rgba(0,0,0,0.15));
+            transition: all 0.1s ease;
+        }
+
+        .guinea-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 8px;
+            color: #4a6b3a;
+            background: #e6f0e0;
+            padding: 4px 20px;
+            border-radius: 40px;
+        }
+
+        .combo-text {
+            text-align: center;
+            font-weight: bold;
+            color: #d68b2c;
+            font-size: 18px;
+            margin-top: 8px;
+            background: #fff0cc;
+            display: inline-block;
+            padding: 6px 20px;
+            border-radius: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #2d3e24;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 16px;
+            font-weight: bold;
+            background: #1e2e16;
+            border: none;
+            color: #c8e6b5;
+            font-size: 18px;
+            transition: 0.1s;
+            cursor: pointer;
+        }
+
+        .tab-btn.active {
+            background: #7da064;
+            color: #1e2e16;
+            box-shadow: inset 0 -4px 0 #b8d9a6;
+        }
+
+        .panel {
+            padding: 20px;
+            background: #fff9e8;
+            min-height: 350px;
+        }
+
+        .card-item {
+            background: white;
+            border-radius: 24px;
+            padding: 14px;
+            margin-bottom: 12px;
+            border: 2px solid #b8c9a8;
+            box-shadow: 5px 5px 0 #cbdbb8;
+        }
+
+.card-title {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .card-desc {
+            font-size: 13px;
+            color: #5a5a4a;
+            margin: 4px 0;
+        }
+
+        .card-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .buy-btn {
+            background: #7da064;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            box-shadow: 2px 2px 0 #4a6b3a;
+            transition: 0.05s linear;
+        }
+
+        .buy-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: none;
+        }
+
+        .quiz-option {
+            background: #f0f3e8;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 60px;
+            text-align: center;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid #b8c9a8;
+        }
+
+        .quiz-option:active {
+            background: #e0e8d0;
+        }
+
+        button {
+            background: none;
+            border: none;
+        }
+
+        .disabled-card {
+            opacity: 0.6;
+            filter: grayscale(0.1);
+        }
+    </style>
+</head>
+<body>
+<div class="game-container" id="gameRoot">
+    <div class="stats">
+        <div class="balance-row">
+            <span>💰 БАЛАНС</span>
+            <span class="balance-value" id="balanceDisplay">0</span>
+        </div>
+        <div class="income-row">
+            <span>📈 ДОХОД/ЧАС</span>
+            <span id="incomePerHour">0</span>
+        </div>
+        <div class="income-row">
+            <span>⭐ УРОВЕНЬ</span>
+            <span class="level-badge" id="levelDisplay">1</span>
+        </div>
+    </div>
+
+    <div class="guinea-area" id="tapZone">
+        <div class="guinea-emoji" id="guineaEmoji">🐹</div>
+        <div class="guinea-name">Бизик 💼</div>
+        <div class="combo-text" id="comboLabel">🔥 кликай!</div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="shop">🏪 МАГАЗИН</button>
+        <button class="tab-btn" data-tab="academy">📚 АКАДЕМИЯ</button>
+    </div>
+
+    <div id="shopPanel" class="panel">
+        <!-- карточки будут тут -->
+        <div style="text-align:center; color:#9aa87a;">загрузка карточек...</div>
+    </div>
+    <div id="academyPanel" class="panel" style="display:none;">
+        <div style="text-align:center;">📖 викторины повышают уровень</div>
+    </div>
+</div>
+
+<script>
+    // ---------- МОДЕЛЬ ДАННЫХ ----------
+    let gameState = {
+        balance: 100,
+        level: 1,
+        passivePerHour: 0,
+        passedQuizzes: new Set(), // какие уровни пройдены
+        lastTapTime: 0,
+        comboActive: false,
+        ownedCards: [], // id купленных карт
+        cardDebuffs: {} // id карты -> до какого времени (timestamp) ослаблена
+    };
+
+    // Доступные инвестиции
+    const cardsCatalog = [
+        { id: 'piggy', title: 'Копилка', desc: 'надёжно, как банка', price: 80, incomeBoost: 45, risk: 0 },
+        { id: 'crypto', title: 'Криптобобр', desc: 'высокий доход, но волатильный', price: 450, incomeBoost: 280, risk: 0.35 },
+        { id: 'stocks', title: 'Акции Грызунпрома', desc: 'стабильный дивиденд', price: 1200, incomeBoost: 560, risk: 0.1 }
+    ];
+
+    // Викторины
+    const quizzes = [
+        { levelReq: 1, question: "Что лучше всего помогает не прогореть?", options: ["Держать всё в одной крипте", "Диверсификация", "Спрятать под подушку"], correct: 1, reward: 50 },
+        { levelReq: 2, question: "Что такое пассивный доход?", options: ["Фриланс", "Деньги, которые работают без тебя", "Лотерейный билет"], correct: 1, reward: 80 },
+        { levelReq: 3, question: "Какой актив самый рискованный?", options: ["Криптовалюта", "Депозит в банке", "Облигации"], correct: 0, reward: 120 }
+    ];
+
+// Вспомогательные функции
+    function formatBalance(b) { return b.toFixed(2); }
+    function updateUI() {
+        document.getElementById('balanceDisplay').innerText = formatBalance(gameState.balance);
+        document.getElementById('levelDisplay').innerText = gameState.level;
+        // пересчёт активного пассивного дохода (учитывая дебаффы)
+        let totalIncome = 0;
+        for (let card of cardsCatalog) {
+            if (gameState.ownedCards.includes(card.id)) {
+                const debuffUntil = gameState.cardDebuffs[card.id];
+                const isDebuffed = debuffUntil && Date.now() < debuffUntil;
+                if (!isDebuffed) totalIncome += card.incomeBoost;
+            }
+        }
+        gameState.passivePerHour = totalIncome;
+        document.getElementById('incomePerHour').innerText = Math.floor(totalIncome) + " ₿";
+        
+        renderShop();
+        renderAcademy();
+    }
+
+    // пассивный доход тикает каждую секунду
+    function startPassiveIncome() {
+        setInterval(() => {
+            if (gameState.passivePerHour > 0) {
+                let incomePerSec = gameState.passivePerHour / 3600;
+                gameState.balance += incomePerSec;
+                checkLevelUp();
+                updateUI();
+            }
+        }, 1000);
+    }
+
+    // клик по Бизику
+    function onTapGuinea() {
+        const now = Date.now();
+        let reward = 1 + (gameState.level - 1) * 0.2;
+        if (gameState.lastTapTime && (now - gameState.lastTapTime) < 500) {
+            reward *= 2;
+            gameState.comboActive = true;
+            document.getElementById('comboLabel').innerHTML = "✨ КОМБО x2 ✨";
+            setTimeout(() => {
+                if(document.getElementById('comboLabel')) document.getElementById('comboLabel').innerHTML = "🐹 кликай!";
+            }, 400);
+        } else {
+            gameState.comboActive = false;
+            document.getElementById('comboLabel').innerHTML = "⚡ быстрый клик = комбо";
+        }
+        gameState.lastTapTime = now;
+        gameState.balance += reward;
+        checkLevelUp();
+        updateUI();
+        
+        // анимация морской свинки
+        const emojiSpan = document.getElementById('guineaEmoji');
+        emojiSpan.style.transform = 'scale(0.9)';
+        setTimeout(() => { if(emojiSpan) emojiSpan.style.transform = ''; }, 100);
+    }
+
+    // покупка карточки
+    function buyCard(card) {
+        if (gameState.balance >= card.price && !gameState.ownedCards.includes(card.id)) {
+            gameState.balance -= card.price;
+            gameState.ownedCards.push(card.id);
+            // если у карты есть риск - она пока не дебаффнута
+            if (card.risk > 0) {
+                // риск-менеджер: через случайный интервал может обвалиться
+                scheduleRiskForCard(card);
+            }
+            checkLevelUp();
+            updateUI();
+            return true;
+        }
+        return false;
+    }
+
+    // риск: временно отключаем бонус карты
+    function scheduleRiskForCard(card) {
+        // не детерминированно, но правдоподобно: каждые 45-90 сек может триггернуть
+        function applyRisk() {
+            if (!gameState.ownedCards.includes(card.id)) return;
+            const isAlreadyDebuffed = gameState.cardDebuffs[card.id] && gameState.cardDebuffs[card.id] > Date.now();
+            if (!isAlreadyDebuffed && Math.random() < 0.25) { // 25% шанс обвала в момент проверки
+                gameState.cardDebuffs[card.id] = Date.now() + 15_000; // 15 секунд демо-дебафф (в real игре 15 мин)
+                updateUI();
+                // через 15 сек снять дебафф
+                setTimeout(() => {
+                    if (gameState.cardDebuffs[card.id] && gameState.cardDebuffs[card.id] <= Date.now() + 100) {
+                        delete gameState.cardDebuffs[card.id];
+                        updateUI();
+                    }
+                }, 15000);
+            }
+            setTimeout(applyRisk, 30000 + Math.random() * 30000);
+        }
+        setTimeout(applyRisk, 20000);
+    }
+
+function checkLevelUp() {
+        let neededBalance = 500 * gameState.level;
+        if (gameState.balance >= neededBalance && (gameState.passedQuizzes.has(gameState.level + 1) || gameState.level >= 4)) {
+            // если следующий уровень уже сдан или это не требуется для перехода, то повышаем
+            if (gameState.passedQuizzes.has(gameState.level + 1) || gameState.level >= 3) {
+                gameState.level++;
+                updateUI();
+            }
+        }
+    }
+
+    // ответ на викторину
+    function answerQuiz(quiz, answerIndex) {
+        if (quiz.levelReq > gameState.level) return false;
+        if (gameState.passedQuizzes.has(quiz.levelReq)) return false;
+        if (answerIndex === quiz.correct) {
+            gameState.balance += quiz.reward;
+            gameState.passedQuizzes.add(quiz.levelReq);
+            checkLevelUp();
+            updateUI();
+            return true;
+        }
+        return false;
+    }
+
+    // ----- ОТРИСОВКА МАГАЗИНА -----
+    function renderShop() {
+        const container = document.getElementById('shopPanel');
+        if (!container) return;
+        let html = '';
+        for (let card of cardsCatalog) {
+            const owned = gameState.ownedCards.includes(card.id);
+            const debuffUntil = gameState.cardDebuffs[card.id];
+            const isDebuffed = debuffUntil && debuffUntil > Date.now();
+            let riskTag = card.risk > 0 ? <span style="color:#c97e2a;"> ⚠️ риск ${(card.risk*100).toFixed(0)}%</span> : '';
+            let debuffTag = isDebuffed ? <div style="color:#b5651e; font-size:12px;">🔻 обвал рынка (бонус отключен)</div> : '';
+            html += 
+                <div class="card-item ${owned ? 'disabled-card' : ''}">
+                    <div class="card-title">${card.title} ${riskTag}</div>
+                    <div class="card-desc">${card.desc}</div>
+                    <div class="card-stats">
+                        <span>➕ +${card.incomeBoost} ₿/час</span>
+                        ${!owned ? <button class="buy-btn" data-id="${card.id}">💰 ${card.price} ₿</button> : '<span style="background:#cbdbb8; padding:6px 16px; border-radius:40px;">✅ куплено</span>'}
+                    </div>
+                    ${debuffTag}
+                </div>
+            ;
+        }
+        container.innerHTML = html;
+        // навесить события на кнопки
+        for (let card of cardsCatalog) {
+            const btn = container.querySelector(.buy-btn[data-id="${card.id}"]);
+            if (btn) {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    buyCard(card);
+                });
+            }
+        }
+    }
+
+    function renderAcademy() {
+        const container = document.getElementById('academyPanel');
+        if (!container) return;
+        const availableQuizzes = quizzes.filter(q => q.levelReq <= gameState.level && !gameState.passedQuizzes.has(q.levelReq));
+        if (availableQuizzes.length === 0) {
+            container.innerHTML = <div style="text-align:center; padding:20px;">✅ Все доступные викторины пройдены! Повышай уровень дальше.</div>;
+            return;
+        }
+        let html = <div style="font-weight:bold; margin-bottom:12px;">📚 Ответь на вопрос, чтобы открыть следующий уровень:</div>;
+        for (let q of availableQuizzes) {
+            html += <div style="background:#ecf0e5; border-radius:28px; padding:12px; margin-bottom:16px;">
+                        <div style="font-weight:bold;">⭐ уровень ${q.levelReq} · награда ${q.reward} ₿</div>
+                        <div style="margin:8px 0;">❓ ${q.question}</div>;
+            for (let i = 0; i < q.options.length; i++) {
+                html += <div class="quiz-option" data-qidx="${quizzes.indexOf(q)}" data-optidx="${i}">${q.options[i]}</div>;
+
+}
+            html += </div>;
+        }
+        container.innerHTML = html;
+        for (let q of availableQuizzes) {
+            const qIndex = quizzes.indexOf(q);
+            const opts = container.querySelectorAll(.quiz-option[data-qidx="${qIndex}"]);
+            opts.forEach(opt => {
+                opt.addEventListener('click', (e) => {
+                    const optIndex = parseInt(opt.getAttribute('data-optidx'));
+                    const success = answerQuiz(q, optIndex);
+                    alert(success ? ✅ Верно! +${q.reward} ₿ : ❌ Неправильно, попробуй ещё раз);
+                    renderAcademy();
+                    updateUI();
+                });
+            });
+        }
+    }
+
+    // --- Переключение табов ---
+    function initTabs() {
+        const btns = document.querySelectorAll('.tab-btn');
+        const shopPanel = document.getElementById('shopPanel');
+        const academyPanel = document.getElementById('academyPanel');
+        btns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                btns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const tab = btn.getAttribute('data-tab');
+                if (tab === 'shop') {
+                    shopPanel.style.display = 'block';
+                    academyPanel.style.display = 'none';
+                    renderShop();
+                } else {
+                    shopPanel.style.display = 'none';
+                    academyPanel.style.display = 'block';
+                    renderAcademy();
+                }
+            });
+        });
+    }
+
+    // приветствие Бизика
+    function showWelcome() {
+        setTimeout(() => {
+            alert("🐹 Привет, я Бизик! Тыкай на меня — зарабатывай. Покупай карточки — доход капает сам. Рискни с криптой, но не прогори. Проходи тесты — качаем уровень! Погнали?");
+        }, 200);
+    }
+
+    // --- ЗАПУСК ---
+    function startGame() {
+        initTabs();
+        document.getElementById('tapZone').addEventListener('click', onTapGuinea);
+        startPassiveIncome();
+        updateUI();
+        showWelcome();
+    }
+
+    startGame();
+</script>await callback.answer("Куплено! Теперь доход капает сам.")
+    elif callback.data == "buy_card2" and user["balance"] >= 500:
+        user["balance"] -= 500
+        user["passive_income"] += 10
+        await callback.answer("Ого! Ты крипто-инвестор.")
+    else:
+        await callback.answer("Недостаточно монет!")
+
+# Профиль и уровни
+@dp.message(F.text == "🎓 Профиль/Уровни")
+async def profile(message: types.Message):
+    user = get_user_data(message.from_user.id)
+    status = "Новичок (в худи)" if user["level"] == 1 else "Специалист (в костюме)"
+    
+    text = (
+        f"👤 Твой статус: {status}\n"
+        f"💰 Баланс: {int(user['balance'])}\n"
+        f"⚙️ Пассивный доход: {user['passive_income']} 🪙/сек\n\n"
+    )
+    
+    if not user["quiz_passed"] and user["balance"] >= 100:
+        builder = InlineKeyboardBuilder()
+        builder.button(text="Пройти тест на 2 уровень", callback_data="start_quiz")
+        await message.answer(text + "Тебе доступен новый уровень!", reply_markup=builder.as_markup())
+    else:
+        await message.answer(text)
+
+# Викторина (Финграмотность)
+@dp.callback_query(F.data == "start_quiz")
+async def start_quiz(callback: types.CallbackQuery):
+    builder = InlineKeyboardBuilder()
+    builder.button(text="Игнорировать и заблокировать", callback_data="quiz_right")
+    builder.button(text="Сказать код (это же из банка!)", callback_data="quiz_wrong")
+    
+    await callback.message.edit_text(
+        "ВОПРОС: Тебе пишет 'сотрудник банка' и просит код из СМС, чтобы спасти твои деньги. Твои действия?",
+        reply_markup=builder.as_markup()
+    )
+
+@dp.callback_query(F.data.startswith("quiz_"))
+
+async def quiz_res(callback: types.CallbackQuery):
+    user = get_user_data(callback.from_user.id)
+    if callback.data == "quiz_right":
+        user["level"] = 2
+        user["quiz_passed"] = True
+        user["click_power"] += 5
+        await callback.message.edit_text("Верно! Ты защитил свои деньги и получил 2 уровень (новый костюм и +5 к клику)!")
+    else:
+        await callback.message.edit_text("Ошибка! Мошенники украли бы твои деньги. Попробуй позже.")
+
+async def main():
+    await dp.start_polling(bot)
+
+if name == "main":
+    asyncio.run(main())
+</body>
+</html>
+
+import asyncio
+import time
+from aiogram import Bot, Dispatcher, types, F
+from aiogram.filters import Command
+from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
+
+# Вставь сюда свой токен
+TOKEN = "ТВОЙ_ТОКЕН_ОТ_BOTFATHER"
+
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
+
+# Имитация базы данных
+users = {}
+
+def get_user_data(user_id):
+    if user_id not in users:
+        users[user_id] = {
+            "balance": 0,
+            "click_power": 1,
+            "passive_income": 0, # в секунду
+            "last_update": time.time(),
+            "level": 1,
+            "quiz_passed": False
+        }
+    
+    # Считаем пассивный доход перед возвратом данных
+    now = time.time()
+    duration = now - users[user_id]["last_update"]
+    earned = duration * users[user_id]["passive_income"]
+    users[user_id]["balance"] += earned
+    users[user_id]["last_update"] = now
+    
+    return users[user_id]
+
+# Главное меню
+def main_menu_kb():
+    builder = ReplyKeyboardBuilder()
+    builder.button(text="🐹 Клик!")
+    builder.button(text="📈 Магазин")
+    builder.button(text="🎓 Профиль/Уровни")
+    builder.adjust(1, 2)
+    return builder.as_markup(resize_keyboard=True)
+
+@dp.message(Command("start"))
+async def start(message: types.Message):
+    get_user_data(message.from_user.id)
+    await message.answer(
+        "Добро пожаловать в Fintech-хомяк! 🐹\nКликая, ты учишься управлять капиталом.",
+        reply_markup=main_menu_kb()
+    )
+
+# Логика клика
+@dp.message(F.text == "🐹 Клик!")
+async def tap(message: types.Message):
+    user = get_user_data(message.from_user.id)
+    user["balance"] += user["click_power"]
+    await message.answer(f"Ты заработал {user['click_power']} 🪙! Баланс: {int(user['balance'])}")
+
+# Магазин карточек
+@dp.message(F.text == "📈 Магазин")
+async def shop(message: types.Message):
+    builder = InlineKeyboardBuilder()
+    # Карточка 1
+    builder.button(text="💳 Дебетовая карта (+1/сек) - 50 🪙", callback_data="buy_card1")
+    # Карточка 2
+    builder.button(text="🚀 Криптобиржа (+10/сек) - 500 🪙", callback_data="buy_card2")
+    builder.adjust(1)
+    
+    await message.answer("Выбери инвестицию:", reply_markup=builder.as_markup())
+
+@dp.callback_query(F.data.startswith("buy_"))
+async def buy_card(callback: types.CallbackQuery):
+    user = get_user_data(callback.from_user.id)
+    
+    if callback.data == "buy_card1" and user["balance"] >= 50:
+        user["balance"] -= 50
+        user["passive_income"] += 1
+
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/game_provider.dart';
+import '../models/quiz.dart';
+
+class AcademyScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final provider = Provider.of<GameProvider>(context);
+    final quizzes = provider.getAvailableQuizzes();
+
+    return Scaffold(
+      appBar: AppBar(title: Text('Финансовая академия'), backgroundColor: Colors.amber),
+      body: quizzes.isEmpty
+          ? Center(child: Text('Все викторины пройдены!\nПовышайте уровень для новых', textAlign: TextAlign.center))
+          : ListView.builder(
+              itemCount: quizzes.length,
+              itemBuilder: (ctx, i) {
+                final q = quizzes[i];
+                return Card(
+                  margin: EdgeInsets.all(12),
+                  child: ListTile(
+                    title: Text(q.question, style: TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: Text('Награда: ${q.reward} ₿'),
+                    trailing: Icon(Icons.quiz),
+                    onTap: () => _showQuizDialog(context, q),
+                  ),
+                );
+              },
+            ),
+    );
+  }
+
+  void _showQuizDialog(BuildContext context, QuizQuestion quiz) {
+    final provider = Provider.of<GameProvider>(context, listen: false);
+    showDialog(
+      context: context,
+      builder: (dialogCtx) {
+        int selected = -1;
+        return StatefulBuilder(
+          builder: (ctx, setState) {
+            return AlertDialog(
+              title: Text(quiz.question),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: List.generate(quiz.options.length, (idx) {
+                  return RadioListTile<int>(
+                    title: Text(quiz.options[idx]),
+                    value: idx,
+                    groupValue: selected,
+                    onChanged: (val) => setState(() => selected = val!),
+                  );
+                }),
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Отмена')),
+                ElevatedButton(
+                  onPressed: selected != -1
+                      ? () {
+                          final success = provider.answerQuiz(quiz, selected);
+                          Navigator.pop(ctx);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(success ? 'Правильно! +${quiz.reward} ₿' : 'Неверно, попробуй ещё раз')),
+                          );
+                        }
+                      : null,
+                  child: Text('Ответить'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+} import 'package:flutter/material.dart';
+import '../models/card.dart';
+
+class CardWidget extends StatelessWidget {
+  final CardItem card;
+  final bool isOwned;
+  final VoidCallback onBuy;
+
+  const CardWidget({super.key, required this.card, required this.isOwned, required this.onBuy});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 8),
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(card.title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 4),
+                  Text(card.description, style: TextStyle(color: Colors.grey[600])),
+                  SizedBox(height: 8),
+
+Row(
+                    children: [
+                      Icon(Icons.monetization_on, size: 16, color: Colors.green),
+                      Text(' ${card.incomeBoost} ₿/час', style: TextStyle(fontWeight: FontWeight.bold)),
+                      SizedBox(width: 16),
+                      if (card.riskFactor > 0)
+                        Row(
+                          children: [
+                            Icon(Icons.warning_amber, size: 16, color: Colors.red),
+                            Text(' Риск ${(card.riskFactor * 100).toInt()}%'),
+                          ],
+                        ),
+                    ],
+                  ),
+                  if (card.isDebuffed)
+                    Padding(
+                      padding: EdgeInsets.only(top: 4),
+                      child: Text('⚠️ Временно заблокирована риском', style: TextStyle(color: Colors.red, fontSize: 12)),
+                    ),
+                ],
+              ),
+            ),
+            if (!isOwned)
+              ElevatedButton(
+                onPressed: onBuy,
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+                child: Text('${card.price} ₿'),
+              )
+            else
+              Chip(label: Text('Приобретено'), backgroundColor: Colors.grey.shade300),
+          ],
+        ),
+      ),
+    );
+  }
+}
